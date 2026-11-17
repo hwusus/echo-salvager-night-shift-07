@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071014">
+  <meta name="description" content="Echo Salvager — a tiny offline sonar-stealth game. Find three lost cores, then make it back to the lift." />
+  <title>Echo Salvager — Night Shift 07</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='8' fill='%2375ffe1'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%2375ffe1' stroke-width='3' opacity='.7'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="game.js"></script>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div><p class="eyebrow">FIELD RECOVERY UNIT <span>·</span> OFFLINE BUILD 07</p><h1>ECHO <b>SALVAGER</b></h1></div>
+      </div>
+      <div class="top-actions">
+        <div class="run-id"><span class="live-dot"></span> NIGHT SHIFT <b>07</b></div>
+        <button id="soundToggle" class="icon-button" type="button" aria-pressed="false" title="Toggle sound">SOUND <span id="soundState">OFF</span></button>
+        <button id="pauseButton" class="icon-button" type="button" hidden>PAUSE <span>P</span></button>
+      </div>
+    </header>
+
+    <section class="game-layout" aria-label="Echo Salvager game">
+      <section class="play-column">
+        <div class="viewport-heading"><div><span class="section-kicker">ABANDONED TRANSIT VAULT</span><span class="location-dot"></span><span class="location-name">SECTOR 04 · THE QUIET</span></div><div class="viewport-meta"><span id="runState">AWAITING DEPLOYMENT</span><span class="meta-divider">/</span><span>SEED <b>07-41</b></span></div></div>
+        <div class="canvas-frame" id="canvasFrame">
+          <canvas id="gameCanvas" width="930" height="630" aria-label="Top-down salvage maze. Use WASD or arrow keys to move. Space sends a sonar pulse. Press F then click the map to throw a decoy echo."></canvas>
+          <div class="scanline" aria-hidden="true"></div>
+          <div class="canvas-corner corner-tl" aria-hidden="true"></div><div class="canvas-corner corner-tr" aria-hidden="true"></div><div class="canvas-corner corner-bl" aria-hidden="true"></div><div class="canvas-corner corner-br" aria-hidden="true"></div>
+          <div class="overlay" id="overlay">
+            <div class="mission-card" id="missionCard">
+              <div class="card-stamp"><span class="stamp-icon">◉</span> RECOVERY ORDER <span class="stamp-line"></span><span>04—07</span></div>
+              <div class="card-signal"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <h2 id="overlayTitle">THE DARK<br><em>IS LISTENING.</em></h2>
+              <p class="mission-copy" id="overlayCopy">Three power cores went quiet below the city. Find them. Get back to the lift. Your sonar shows the way — and tells the Warden where you are.</p>
+              <div class="objective-line"><span class="objective-number">01</span><span>RECOVER <b>3 LOST CORES</b></span><span class="objective-arrow">↗</span></div>
+              <div class="objective-line"><span class="objective-number">02</span><span>RETURN TO THE <b>UPPER LIFT</b></span><span class="objective-arrow">↗</span></div>
+              <button id="startButton" class="start-button" type="button"><span>BEGIN SALVAGE</span><b>↗</b></button>
+              <p class="card-footnote"><span class="keycap">WASD</span> / <span class="keycap">↑↓←→</span> MOVE <span class="foot-dot">·</span> <span class="keycap">SPACE</span> SONAR <span class="foot-dot">·</span> <span class="keycap">F</span> DECOY</p>
+            </div>
+          </div>
+          <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        </div>
+        <div class="play-footer"><div class="footer-tip"><span class="tip-icon">⌁</span><span id="statusMessage">A single pulse can light the dark. It will also wake the Warden.</span></div><div class="footer-right"><span class="ping-indicator"></span> <span id="threatLabel">THREAT DORMANT</span></div></div>
+      </section>
+
+      <aside class="mission-sidebar">
+        <div class="panel-heading"><div><span class="section-kicker">YOUR ASSIGNMENT</span><h2>KEEP IT QUIET.</h2></div><div class="mission-index">04<br><span>/ 07</span></div></div>
+        <div class="mission-desc">The vault only exists when you listen. The things inside listen back.</div>
+        <div class="divider"></div>
+        <div class="stat-label"><span>RECOVERED CORES</span><span id="coreCount">00 <i>/ 03</i></span></div>
+        <div class="core-track" id="coreTrack"><span class="core-slot"></span><span class="core-slot"></span><span class="core-slot"></span></div>
+        <div class="stat-grid">
+          <div class="stat-card"><span class="stat-label-small">SONAR CHARGE</span><div class="stat-number" id="chargeValue">05 <small>/ 05</small></div><div class="charge-bars" id="chargeBars"></div></div>
+          <div class="stat-card"><span class="stat-label-small">TIME BELOW</span><div class="stat-number" id="timeValue">00<small>:00</small></div><div class="time-caption" id="lifeCaption"><span class="life-dot"></span><span class="life-dot"></span><span class="life-dot"></span><small>3 LIVES</small></div></div>
+        </div>
+        <div class="sound-tools">
+          <div class="tool-head"><span class="section-kicker">MAKE SOME NOISE</span><span class="tool-note">SOUND ATTRACTS</span></div>
+          <button id="pulseButton" class="tool-button pulse-tool" type="button" disabled><span class="tool-glyph sonar-glyph">⌁</span><span><b>SONAR PULSE</b><small>Reveal nearby · <kbd>SPACE</kbd></small></span><span class="tool-cost">−1</span></button>
+          <button id="baitButton" class="tool-button bait-tool" type="button" disabled><span class="tool-glyph bait-glyph">◎</span><span><b>THROW A DECOY</b><small>Choose a tile · <kbd>F</kbd> + click</small></span><span class="tool-cost">−1</span></button>
+          <p class="bait-hint" id="baitHint">Make a decoy to pull the Warden away from your trail.</p>
+        </div>
+        <div class="divider"></div>
+        <div class="control-block">
+          <div class="tool-head"><span class="section-kicker">FIELD CONTROLS</span><span class="tool-note">KEYBOARD</span></div>
+          <div class="controls-row"><span class="key-cluster"><kbd>W</kbd><span><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span></span><span class="control-caption">MOVE THROUGH THE VAULT</span></div>
+          <div class="controls-row"><span class="keycap">SPACE</span><span class="control-caption">SEND A SONAR PULSE</span></div>
+          <div class="controls-row"><span class="keycap">F</span><span class="control-caption">ARM A DECOY ECHO</span></div>
+          <div class="controls-row"><span class="keycap">P</span><span class="control-caption">PAUSE / RESUME</span></div>
+        </div>
+        <div class="sidebar-bottom"><span class="shield-mark">◈</span><span>NO NETWORK. NO TRACKING.<br><b>JUST YOU AND THE DARK.</b></span><span class="build-tag">v0.7<br>LOCAL</span></div>
+      </aside>
+    </section>
+    <footer class="page-footer"><span>FIELD RECOVERY UNIT <b>///</b> TRAINING SIMULATION</span><span>DESIGNED FOR DARKNESS <b>·</b> RUNS ENTIRELY OFFLINE</span></footer>
+  </main>
+</body>
+</html>
